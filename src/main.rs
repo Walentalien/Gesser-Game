@@ -1,16 +1,41 @@
 use std::io;
 use std::cmp::Ordering;
 use rand::Rng;
+use std::env;
 
 fn main() {
+    // Create iterator to collect command-line arguments
+    let args: Vec<String> = env::args().collect();
+    // dbg!(&args);
+
+    if args.len() != 2 {
+        println!("Usage: guess_game <number_of_attempts>");
+        return;
+    }
+
+    // Parse the number of attempts from the command-line argument
+    let max_attempts: u32 = match args[1].trim().parse() {
+        Ok(num) => num,
+        Err(_) => {
+            println!("Please enter a valid number for the maximum attempts.");
+            return;
+        }
+    };
+
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
-    // println!("The secret number is: {}", secret_number); // Uncomment to debug
     let mut number_of_guesses: u32 = 0;
 
     loop {
-        println!("Please input your guess.");
+        // Check if the player has exceeded the allowed attempts
+        if number_of_guesses >= max_attempts {
+            println!("You've exceeded the maximum number of attempts. You lose!");
+            println!("The secret number was: {}", secret_number);
+            break;
+        }
+
+        println!("Please input your guess. Attempt {}/{}", number_of_guesses + 1, max_attempts);
 
         let mut guess = String::new();
         io::stdin()
